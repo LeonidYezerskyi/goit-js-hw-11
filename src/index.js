@@ -9,6 +9,7 @@ const loadMoreBtn = document.querySelector('.load-more');
 
 let page = 1;
 let imageName = '';
+// let totalHits = 0;
 
 searchForm.addEventListener('submit', searchImage);
 loadMoreBtn.addEventListener('click', loadMore);
@@ -51,7 +52,7 @@ async function searchImage(event) {
   clearInput();
 
   try {
-    const { hits } = await fetchImages(imageName);
+    const { hits, totalHits } = await fetchImages(imageName);
     if (hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -60,6 +61,7 @@ async function searchImage(event) {
       markupImageCard(hits);
       loadMoreBtn.hidden = false;
       loadMoreBtn.classList.add('load-more');
+      Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
     }
   } catch (error) {
     Notiflix.Notify.failure(
@@ -76,6 +78,7 @@ async function loadMore(event) {
   page += 1;
   const { hits, totalHits } = await fetchImages(imageName, page);
   markupImageCard(hits);
+
   const gallery = $('.gallery a').simpleLightbox();
   gallery.refresh();
 
