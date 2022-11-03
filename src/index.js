@@ -1,5 +1,7 @@
 import { fetchImages, perPage } from './api/fetchImages';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const searchForm = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
@@ -16,9 +18,18 @@ loadMoreBtn.classList.remove('load-more');
 
 function markupImageCard(images) {
   const markup = images
-    .map(({ webformatURL, tags, likes, views, comments, downloads }) => {
-      return `<div class="photo-card">
-        <img src="${webformatURL}" alt="${tags}" loading="lazy"/>
+    .map(
+      ({
+        largeImageURL,
+        webformatURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `<div class="photo-card">
+        <a href = "${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy"/></a>
         <div class="info">
           <p class="info-item"><b>Likes</b>${likes}</p>
           <p class="info-item"><b>Views</b>${views}</p>
@@ -26,9 +37,11 @@ function markupImageCard(images) {
           <p class="info-item"><b>Downloads</b>${downloads}</p>
         </div>
       </div>`;
-    })
+      }
+    )
     .join('');
   galleryList.insertAdjacentHTML('beforeend', markup);
+  new SimpleLightbox('.gallery a');
 }
 
 async function searchImage(event) {
@@ -63,6 +76,9 @@ async function loadMore(event) {
   page += 1;
   const { hits, totalHits } = await fetchImages(imageName, page);
   markupImageCard(hits);
+  const gallery = $('.gallery a').simpleLightbox();
+  gallery.refresh();
+
   if ((page + 1) * perPage > totalHits) {
     loadMoreBtn.hidden = true;
     loadMoreBtn.classList.remove('load-more');
