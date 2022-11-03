@@ -2,6 +2,7 @@ import { fetchImages, perPage } from './api/fetchImages';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { getScroll } from './scroll';
 
 const searchForm = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
@@ -9,7 +10,6 @@ const loadMoreBtn = document.querySelector('.load-more');
 
 let page = 1;
 let imageName = '';
-// let totalHits = 0;
 
 searchForm.addEventListener('submit', searchImage);
 loadMoreBtn.addEventListener('click', loadMore);
@@ -62,6 +62,7 @@ async function searchImage(event) {
       loadMoreBtn.hidden = false;
       loadMoreBtn.classList.add('load-more');
       Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
+      getScroll();
     }
   } catch (error) {
     Notiflix.Notify.failure(
@@ -78,6 +79,7 @@ async function loadMore(event) {
   page += 1;
   const { hits, totalHits } = await fetchImages(imageName, page);
   markupImageCard(hits);
+  getScroll();
 
   const gallery = $('.gallery a').simpleLightbox();
   gallery.refresh();
