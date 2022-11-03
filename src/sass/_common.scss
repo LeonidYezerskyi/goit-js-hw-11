@@ -17,21 +17,21 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 13px;
     flex-wrap: wrap;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 img {
-    width: 320px;
-    height: 196px;
+    width: 240px;
+    height: 160px;
 }
 
 .info {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
     border: 1px solid #EEEEEE;
     border-top: transparent;
     box-shadow:
@@ -44,5 +44,18 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 16px;
+    font-size: 12px;
+}
+
+.load-more {
+    display: block;
+   margin: auto;
+   padding: 5px 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 3px solid yellowgreen;
+    color: red;
+    font-size: 15px;
+    background-color: white;
+    cursor: pointer;
 }

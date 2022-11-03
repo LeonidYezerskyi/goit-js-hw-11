@@ -1,14 +1,19 @@
-import { fetchImages } from './api/fetchImages';
+import { fetchImages, perPage } from './api/fetchImages';
 import Notiflix from 'notiflix';
-// import axios from 'axios';
 
 const searchForm = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
+const loadMoreBtn = document.querySelector('.load-more');
+
+let page = 1;
+let imageName = '';
 
 searchForm.addEventListener('submit', searchImage);
+loadMoreBtn.addEventListener('click', loadMore);
+loadMoreBtn.hidden = true;
+loadMoreBtn.classList.remove('load-more');
 
 function markupImageCard(images) {
-  console.log(images);
   const markup = images
     .map(({ webformatURL, tags, likes, views, comments, downloads }) => {
       return `<div class="photo-card">
@@ -22,20 +27,25 @@ function markupImageCard(images) {
       </div>`;
     })
     .join('');
-  galleryList.innerHTML = markup;
+  galleryList.insertAdjacentHTML('beforeend', markup);
 }
 
 function searchImage(event) {
   event.preventDefault();
-
-  let imageName = searchForm.searchQuery.value.trim();
+  imageName = searchForm.searchQuery.value.trim();
   if (imageName === '') return;
   clearInput();
 
   fetchImages(imageName)
     .then(({ hits }) => {
-      if (hits) {
+      if (hits.length === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else {
         markupImageCard(hits);
+        loadMoreBtn.hidden = false;
+        loadMoreBtn.classList.add('load-more');
       }
     })
     .catch(error => {
@@ -47,4 +57,18 @@ function searchImage(event) {
 
 function clearInput() {
   galleryList.innerHTML = '';
+}
+
+function loadMore(event) {
+  page += 1;
+  fetchImages(imageName, page).then(({ hits, totalHits }) => {
+    markupImageCard(hits);
+    if ((page + 1) * perPage > totalHits) {
+      loadMoreBtn.hidden = true;
+      loadMoreBtn.classList.remove('load-more');
+      Notiflix.Notify.warning(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
+  });
 }
