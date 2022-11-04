@@ -8,14 +8,13 @@ const searchForm = document.querySelector('.search-form');
 const galleryList = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
+const simpleLightbox = new SimpleLightbox('.gallery a');
+
 let page = 1;
 let imageName = '';
 
 searchForm.addEventListener('submit', searchImage);
 loadMoreBtn.addEventListener('click', loadMore);
-
-loadMoreBtn.hidden = true;
-loadMoreBtn.classList.remove('load-more');
 
 function markupImageCard(images) {
   const markup = images
@@ -42,14 +41,15 @@ function markupImageCard(images) {
     )
     .join('');
   galleryList.insertAdjacentHTML('beforeend', markup);
-  new SimpleLightbox('.gallery a');
+  simpleLightbox.refresh();
 }
 
 async function searchImage(event) {
   event.preventDefault();
   imageName = searchForm.searchQuery.value.trim();
-  if (imageName === '') return;
   clearInput();
+
+  if (imageName === '') return;
 
   try {
     const { hits, totalHits } = await fetchImages(imageName);
@@ -59,9 +59,12 @@ async function searchImage(event) {
       );
     } else {
       markupImageCard(hits);
-      loadMoreBtn.hidden = false;
-      loadMoreBtn.classList.add('load-more');
       Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
+      if (hits.length < 40) {
+        loadMoreBtn.classList.add('is-hidden');
+      } else {
+        loadMoreBtn.classList.remove('is-hidden');
+      }
       getScroll();
     }
   } catch (error) {
@@ -80,13 +83,8 @@ async function loadMore(event) {
   const { hits, totalHits } = await fetchImages(imageName, page);
   markupImageCard(hits);
   getScroll();
-
-  const gallery = $('.gallery a').simpleLightbox();
-  gallery.refresh();
-
-  if ((page + 1) * perPage > totalHits) {
-    loadMoreBtn.hidden = true;
-    loadMoreBtn.classList.remove('load-more');
+  if (page * perPage >= totalHits) {
+    loadMoreBtn.classList.add('is-hidden');
     Notiflix.Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
