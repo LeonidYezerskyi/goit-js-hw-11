@@ -48,8 +48,13 @@ async function searchImage(event) {
   event.preventDefault();
   imageName = searchForm.searchQuery.value.trim();
   clearInput();
-
-  if (imageName === '') return;
+  loadMoreBtn.classList.add('is-hidden');
+  if (imageName === '') {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    return;
+  }
 
   try {
     const { hits, totalHits } = await fetchImages(imageName);
@@ -60,9 +65,7 @@ async function searchImage(event) {
     } else {
       markupImageCard(hits);
       Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
-      if (hits.length < 40) {
-        loadMoreBtn.classList.add('is-hidden');
-      } else {
+      if (hits.length > 40) {
         loadMoreBtn.classList.remove('is-hidden');
       }
       getScroll();
