@@ -65,7 +65,7 @@ async function searchImage(event) {
     } else {
       markupImageCard(hits);
       Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
-      if (hits.length > 40) {
+      if (totalHits > 40) {
         loadMoreBtn.classList.remove('is-hidden');
       }
       getScroll();
